@@ -1,0 +1,253 @@
+openapi: 3.0.3
+info:
+  title: Neon Database CRUD API
+  description: API untuk mengelola data siswa, guru, dan staff yang tersimpan di Neon Database.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://your-render-app.onrender.com
+    description: Production server on Render
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/students:
+    get:
+      summary: List all students
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      summary: Create a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '201':
+          description: Student created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+
+  /api/students/{id}:
+    put:
+      summary: Update a student by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '200':
+          description: Student updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+    delete:
+      summary: Delete a student by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Student deleted
+
+  /api/teachers:
+    get:
+      summary: List all teachers
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      summary: Create a teacher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '201':
+          description: Teacher created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+
+  /api/teachers/{id}:
+    put:
+      summary: Update a teacher by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '200':
+          description: Teacher updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+    delete:
+      summary: Delete a teacher by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Teacher deleted
+
+  /api/staff:
+    get:
+      summary: List all staff
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      summary: Create a staff member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '201':
+          description: Staff created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+
+  /api/staff/{id}:
+    put:
+      summary: Update a staff member by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '200':
+          description: Staff updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+    delete:
+      summary: Delete a staff member by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Staff deleted
+
+components:
+  schemas:
+    PersonInput:
+      type: object
+      required:
+        - nama
+        - umur
+        - tanggal
+      properties:
+        nama:
+          type: string
+          example: Lita
+        umur:
+          type: integer
+          example: 20
+        tanggal:
+          type: string
+          format: date
+          example: '2006-05-12'
+
+    Person:
+      type: object
+      required:
+        - id
+        - nama
+        - umur
+        - tanggal
+      properties:
+        id:
+          type: integer
+          example: 1
+        nama:
+          type: string
+          example: Lita
+        umur:
+          type: integer
+          example: 20
+        tanggal:
+          type: string
+          format: date
+          example: '2006-05-12'
