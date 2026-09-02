@@ -1,16 +1,20 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index?route=/api/$1"
-    },
-    {
       "source": "/health",
       "destination": "/api/index?route=/health"
     },
     {
       "source": "/swagger",
-      "destination": "/api/swagger"
+      "destination": "/api/index?route=/swagger"
+    },
+    {
+      "source": "/openapi.yaml",
+      "destination": "/api/index?route=/openapi.yaml"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index?route=/api/$1"
     }
   ]
 }
