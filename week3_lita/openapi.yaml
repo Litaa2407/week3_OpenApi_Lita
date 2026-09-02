@@ -4,10 +4,8 @@ info:
   description: API untuk mengelola data siswa, guru, dan staff yang tersimpan di Neon Database.
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
-    description: Local development server
-  - url: https://your-render-app.onrender.com
-    description: Production server on Render
+  - url: /
+    description: Current server (local or deployed)
 paths:
   /health:
     get:
