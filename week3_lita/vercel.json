@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/[...route]" },
+    { "source": "/health", "destination": "/api/[...route]" },
+    { "source": "/swagger", "destination": "/api/swagger" },
+    { "source": "/openapi.yaml", "destination": "/openapi.yaml" }
+  ]
+}
