@@ -81,6 +81,25 @@ func main() {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			writeError(w, http.StatusNotFound, "not found")
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  "ok",
+			"message": "Neon Database CRUD API",
+			"endpoints": []string{
+				"/health",
+				"/swagger",
+				"/api/students",
+				"/api/teachers",
+				"/api/staff",
+			},
+		})
+	})
+
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
