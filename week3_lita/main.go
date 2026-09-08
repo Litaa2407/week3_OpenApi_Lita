@@ -321,6 +321,7 @@ func createRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Requ
 		return
 	}
 
+	w.Header().Set("Location", "/api/"+tableName+"/"+strconv.FormatInt(p.ID, 10))
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newPersonResource(tableName, p))
 }
@@ -388,14 +389,20 @@ func hasResourceID(r *http.Request) bool {
 func newPersonResource(tableName string, p person) personResource {
 	basePath := "/api/" + tableName
 	idPath := basePath + "/" + strconv.FormatInt(p.ID, 10)
+	links := map[string]link{
+		"self":       {Href: idPath, Method: http.MethodGet},
+		"collection": {Href: basePath, Method: http.MethodGet},
+		"update":     {Href: idPath, Method: http.MethodPut},
+		"delete":     {Href: idPath, Method: http.MethodDelete},
+	}
+	if tableName == "students" {
+		links["teachers"] = link{Href: "/api/teachers", Method: http.MethodGet}
+		links["staff"] = link{Href: "/api/staff", Method: http.MethodGet}
+	}
+
 	return personResource{
 		person: p,
-		Links: map[string]link{
-			"self":       {Href: idPath, Method: http.MethodGet},
-			"collection": {Href: basePath, Method: http.MethodGet},
-			"update":     {Href: idPath, Method: http.MethodPut},
-			"delete":     {Href: idPath, Method: http.MethodDelete},
-		},
+		Links:  links,
 	}
 }
 
