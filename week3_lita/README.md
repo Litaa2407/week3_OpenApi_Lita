@@ -27,6 +27,7 @@ VALUES
 INSERT INTO staff (nama, umur, tanggal)
 VALUES
 ('Dina', 28, '1998-02-14'),
+- Richardson Maturity Model Level 3 dengan navigasi HATEOAS
 ('Rudi', 32, '1994-11-05');
 ```
 
@@ -49,17 +50,33 @@ Aplikasi akan berjalan di `http://localhost:8080`.
 
 - `GET /health`
 - `GET /api/students`
+- `GET /api/students/{id}`
 - `POST /api/students`
 - `PUT /api/students/{id}`
 - `DELETE /api/students/{id}`
 - `GET /api/teachers`
+- `GET /api/teachers/{id}`
 - `POST /api/teachers`
 - `PUT /api/teachers/{id}`
 - `DELETE /api/teachers/{id}`
 - `GET /api/staff`
+- `GET /api/staff/{id}`
 - `POST /api/staff`
 - `PUT /api/staff/{id}`
 - `DELETE /api/staff/{id}`
+
+## Link HATEOAS
+
+Respons resource menyertakan `_links` agar client dapat menemukan aksi berikutnya tanpa hardcode URL:
+
+```json
+"_links": {
+  "self": {"href": "/api/students/1", "method": "GET"},
+  "collection": {"href": "/api/students", "method": "GET"},
+  "update": {"href": "/api/students/1", "method": "PUT"},
+  "delete": {"href": "/api/students/1", "method": "DELETE"}
+}
+```
 
 ## Contoh request
 

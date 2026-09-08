@@ -23,6 +23,16 @@ type person struct {
 	Tanggal string `json:"tanggal"`
 }
 
+type link struct {
+	Href   string `json:"href"`
+	Method string `json:"method"`
+}
+
+type personResource struct {
+	person
+	Links map[string]link `json:"_links"`
+}
+
 const swaggerHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -236,6 +246,10 @@ func handleTable(db *sql.DB, tableName string) http.HandlerFunc {
 
 		switch r.Method {
 		case http.MethodGet:
+			if hasResourceID(r) {
+				getRow(w, db, tableName, r)
+				return
+			}
 			listRows(w, db, tableName)
 		case http.MethodPost:
 			createRow(w, db, tableName, r)
@@ -257,20 +271,37 @@ func listRows(w http.ResponseWriter, db *sql.DB, tableName string) {
 	}
 	defer rows.Close()
 
-	data := []person{}
+	data := []personResource{}
 	for rows.Next() {
 		var p person
 		if err := rows.Scan(&p.ID, &p.Nama, &p.Umur, &p.Tanggal); err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-		data = append(data, p)
+		data = append(data, newPersonResource(tableName, p))
 	}
 	if err := rows.Err(); err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	json.NewEncoder(w).Encode(data)
+}
+
+func getRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Request) {
+	id, err := getIDFromRequest(r)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var p person
+	query := fmt.Sprintf("SELECT id, nama, umur, tanggal FROM %s WHERE id = $1", tableName)
+	if err := db.QueryRow(query, id).Scan(&p.ID, &p.Nama, &p.Umur, &p.Tanggal); err != nil {
+		writeError(w, http.StatusNotFound, "record not found")
+		return
+	}
+
+	json.NewEncoder(w).Encode(newPersonResource(tableName, p))
 }
 
 func createRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Request) {
@@ -291,7 +322,7 @@ func createRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Requ
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(p)
+	json.NewEncoder(w).Encode(newPersonResource(tableName, p))
 }
 
 func updateRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Request) {
@@ -318,7 +349,7 @@ func updateRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Requ
 		return
 	}
 
-	json.NewEncoder(w).Encode(p)
+	json.NewEncoder(w).Encode(newPersonResource(tableName, p))
 }
 
 func deleteRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Request) {
@@ -335,7 +366,37 @@ func deleteRow(w http.ResponseWriter, db *sql.DB, tableName string, r *http.Requ
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{"status": "deleted", "id": strconv.FormatInt(id, 10)})
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "deleted",
+		"id":     strconv.FormatInt(id, 10),
+		"_links": map[string]link{
+			"collection": {Href: "/api/" + tableName, Method: http.MethodGet},
+		},
+	})
+}
+
+func hasResourceID(r *http.Request) bool {
+	path := strings.Trim(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+	if len(parts) < 3 {
+		return false
+	}
+	_, err := strconv.ParseInt(parts[len(parts)-1], 10, 64)
+	return err == nil
+}
+
+func newPersonResource(tableName string, p person) personResource {
+	basePath := "/api/" + tableName
+	idPath := basePath + "/" + strconv.FormatInt(p.ID, 10)
+	return personResource{
+		person: p,
+		Links: map[string]link{
+			"self":       {Href: idPath, Method: http.MethodGet},
+			"collection": {Href: basePath, Method: http.MethodGet},
+			"update":     {Href: idPath, Method: http.MethodPut},
+			"delete":     {Href: idPath, Method: http.MethodDelete},
+		},
+	}
 }
 
 func getIDFromRequest(r *http.Request) (int64, error) {

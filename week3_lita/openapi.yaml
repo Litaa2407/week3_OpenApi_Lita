@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Neon Database CRUD API
-  description: API untuk mengelola data siswa, guru, dan staff yang tersimpan di Neon Database.
+  description: API Richardson Maturity Model Level 3 dengan navigasi HATEOAS untuk data siswa, guru, dan staff.
   version: 1.0.0
 servers:
   - url: /
@@ -27,13 +27,13 @@ paths:
       summary: List all students
       responses:
         '200':
-          description: Successful response
+          description: Student resources with hypermedia links
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Person'
+                  $ref: '#/components/schemas/PersonResource'
     post:
       summary: Create a student
       requestBody:
@@ -44,21 +44,28 @@ paths:
               $ref: '#/components/schemas/PersonInput'
       responses:
         '201':
-          description: Student created
+          description: Student created with hypermedia links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/PersonResource'
 
   /api/students/{id}:
+    get:
+      summary: Get a student by id
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          description: Student resource with hypermedia links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResource'
     put:
       summary: Update a student by id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/ID'
       requestBody:
         required: true
         content:
@@ -67,35 +74,31 @@ paths:
               $ref: '#/components/schemas/PersonInput'
       responses:
         '200':
-          description: Student updated
+          description: Student updated with hypermedia links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/PersonResource'
     delete:
       summary: Delete a student by id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/ID'
       responses:
         '200':
-          description: Student deleted
+          description: Student deleted with a collection link
 
   /api/teachers:
     get:
       summary: List all teachers
       responses:
         '200':
-          description: Successful response
+          description: Teacher resources with hypermedia links
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Person'
+                  $ref: '#/components/schemas/PersonResource'
     post:
       summary: Create a teacher
       requestBody:
@@ -106,21 +109,28 @@ paths:
               $ref: '#/components/schemas/PersonInput'
       responses:
         '201':
-          description: Teacher created
+          description: Teacher created with hypermedia links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/PersonResource'
 
   /api/teachers/{id}:
+    get:
+      summary: Get a teacher by id
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          description: Teacher resource with hypermedia links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResource'
     put:
       summary: Update a teacher by id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/ID'
       requestBody:
         required: true
         content:
@@ -129,35 +139,31 @@ paths:
               $ref: '#/components/schemas/PersonInput'
       responses:
         '200':
-          description: Teacher updated
+          description: Teacher updated with hypermedia links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/PersonResource'
     delete:
       summary: Delete a teacher by id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/ID'
       responses:
         '200':
-          description: Teacher deleted
+          description: Teacher deleted with a collection link
 
   /api/staff:
     get:
       summary: List all staff
       responses:
         '200':
-          description: Successful response
+          description: Staff resources with hypermedia links
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Person'
+                  $ref: '#/components/schemas/PersonResource'
     post:
       summary: Create a staff member
       requestBody:
@@ -168,21 +174,28 @@ paths:
               $ref: '#/components/schemas/PersonInput'
       responses:
         '201':
-          description: Staff created
+          description: Staff created with hypermedia links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/PersonResource'
 
   /api/staff/{id}:
+    get:
+      summary: Get a staff member by id
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          description: Staff resource with hypermedia links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResource'
     put:
       summary: Update a staff member by id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/ID'
       requestBody:
         required: true
         content:
@@ -191,31 +204,31 @@ paths:
               $ref: '#/components/schemas/PersonInput'
       responses:
         '200':
-          description: Staff updated
+          description: Staff updated with hypermedia links
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/PersonResource'
     delete:
       summary: Delete a staff member by id
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/ID'
       responses:
         '200':
-          description: Staff deleted
+          description: Staff deleted with a collection link
 
 components:
+  parameters:
+    ID:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
   schemas:
     PersonInput:
       type: object
-      required:
-        - nama
-        - umur
-        - tanggal
+      required: [nama, umur, tanggal]
       properties:
         nama:
           type: string
@@ -227,14 +240,9 @@ components:
           type: string
           format: date
           example: '2006-05-12'
-
     Person:
       type: object
-      required:
-        - id
-        - nama
-        - umur
-        - tanggal
+      required: [id, nama, umur, tanggal]
       properties:
         id:
           type: integer
@@ -249,3 +257,24 @@ components:
           type: string
           format: date
           example: '2006-05-12'
+    Link:
+      type: object
+      required: [href, method]
+      properties:
+        href:
+          type: string
+          example: /api/students/1
+        method:
+          type: string
+          enum: [GET, POST, PUT, DELETE]
+          example: GET
+    PersonResource:
+      allOf:
+        - $ref: '#/components/schemas/Person'
+        - type: object
+          required: [_links]
+          properties:
+            _links:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/Link'
